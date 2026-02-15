@@ -3,6 +3,7 @@ package com.rj;
 import com.rj.handlers.FallbackHandler;
 import com.rj.handlers.HealthHandler;
 import com.rj.handlers.IndexHandler;
+import com.rj.net.ReqLogging;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import org.jboss.logging.Logger;
@@ -31,10 +32,13 @@ public class App {
 
                 // health api
                 .get(API_V1_HEALTH, hh::getInfo);
-        
+
+        // logging for all request
+        var withLogging = new ReqLogging(routes);
+
         Undertow server = Undertow.builder()
                 .addHttpListener(8080, "0.0.0.0")
-                .setHandler(routes)
+                .setHandler(withLogging)
                 .build();
 
         server.start();
