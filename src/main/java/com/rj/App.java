@@ -1,6 +1,7 @@
 package com.rj;
 
 import com.rj.handlers.HealthHandler;
+import com.rj.utility.RjUtility;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
@@ -14,26 +15,14 @@ public class App {
 
     public static void start() {
         HealthHandler hh = new HealthHandler();
+        RjUtility ru = new RjUtility();
 
         logger.info("sto partendo.....");
 
         RoutingHandler routes = new RoutingHandler()
                 .get("/", exchange -> {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
-                    exchange.getResponseSender().send(
-                            """
-                                    <html lang="it">
-                                    <head>
-                                        <title>RJ</title>
-                                    </head>
-                                    <body>
-                                      <h1>ciao sono rj entra</h1>
-                                    <hr>
-                                    <a href="/api/v1/health">health v1</a>
-                                    </body>
-                                    </html>
-                               """
-                    );
+                    exchange.getResponseSender().send(ru.getIndex());
                 })
 
                 .get(API_V1_HEALTH, exchange -> {

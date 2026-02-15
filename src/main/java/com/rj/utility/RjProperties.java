@@ -8,7 +8,7 @@ public class RjProperties {
         Properties props = new Properties();
 
         try {
-            props.load(RjProperties.class.getClassLoader().getResourceAsStream("application.properties"));
+            props.load(getClass().getClassLoader().getResourceAsStream("application.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
