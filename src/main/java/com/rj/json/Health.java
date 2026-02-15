@@ -12,9 +12,7 @@ public class Health {
         this.status = status;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;
@@ -44,6 +42,17 @@ public class Health {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public static Health fromJson(String j) {
+        var o = new ObjectMapper();
+        Health h;
+        try {
+            h = o.readValue(j, Health.class);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+        return h;
     }
 
 }
