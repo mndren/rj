@@ -31,12 +31,12 @@ public class App {
 
                 // health api
                 .get(API_V1_HEALTH, hh::getInfo);
-
+        
         Undertow server = Undertow.builder()
                 .addHttpListener(8080, "0.0.0.0")
                 .setHandler(routes)
                 .build();
-        
+
         server.start();
 
 
