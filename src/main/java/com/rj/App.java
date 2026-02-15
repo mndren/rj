@@ -22,11 +22,12 @@ public class App {
         RoutingHandler routes = new RoutingHandler()
                 .get("/", exchange -> {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
-                    if (ru.getIndex().isBlank()) {
+                    String index = ru.getIndex();
+                    if (index.isBlank()) {
                         exchange.setStatusCode(404);
-                        exchange.getResponseSender().send("Pagina non trovata");
+                        exchange.getResponseSender().send("<html><h1>Pagina non trovata</h1></html>");
                     }
-                    exchange.getResponseSender().send(ru.getIndex());
+                    exchange.getResponseSender().send(index);
                 })
 
                 .get(API_V1_HEALTH, exchange -> {
