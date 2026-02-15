@@ -4,6 +4,7 @@ import com.rj.handlers.FallbackHandler;
 import com.rj.handlers.HealthHandler;
 import com.rj.handlers.IndexHandler;
 import com.rj.net.ReqLogging;
+import com.rj.utility.RjProperties;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import org.jboss.logging.Logger;
@@ -19,6 +20,7 @@ public class App {
         var hh = new HealthHandler();
         var fh = new FallbackHandler();
         var ih = new IndexHandler();
+        var rp = new RjProperties();
 
         RoutingHandler routes = new RoutingHandler()
                 // fallback
@@ -38,7 +40,7 @@ public class App {
 
         Undertow server = Undertow.builder()
                 .addHttpListener(8080, "0.0.0.0")
-                .setHandler(withLogging)
+                .setHandler("true".equalsIgnoreCase(rp.getProp("req.logging")) ? withLogging : routes)
                 .build();
 
         server.start();
