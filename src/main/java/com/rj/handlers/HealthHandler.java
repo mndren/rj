@@ -1,4 +1,5 @@
 package com.rj.handlers;
+
 import com.rj.constants.RjConstants;
 import com.rj.json.Health;
 import com.rj.utility.RjProperties;
@@ -19,7 +20,7 @@ public class HealthHandler {
 
         var h = Health.fromJson(Health.toJson("ok", rp.getProp("application.name"), rp.getProp("version")));
 
-        if (h!=null){
+        if (h != null) {
             sb.append("<h1>Health</h1>");
             sb.append("<div class='container'>");
             sb.append("<p> Status: ").append(h.getStatus()).append("</p>");
