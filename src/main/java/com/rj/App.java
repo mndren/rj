@@ -26,13 +26,13 @@ public class App {
                 // fallback
                 .setFallbackHandler(fh::getPage)
 
-                // index page
+                // index
                 .get("/", ih::getPage)
 
-                // health page
+                // health
+                // page
                 .get(SSR_HEALTH, hh::getPage)
-
-                // health api
+                // api
                 .get(API_V1_HEALTH, hh::getInfo);
 
         // logging for all request

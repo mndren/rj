@@ -23,7 +23,7 @@ public class HealthHandler {
         if (h != null) {
             sb.append("<h1>Health</h1>");
             sb.append("<div class='container'>");
-            sb.append("<p> Status: ").append(h.getStatus()).append("</p>");
+            sb.append("<p> Status: ").append("<b>").append(h.getStatus()).append("</b>").append("</p>");
             sb.append("<p> Name: ").append(h.getName()).append("</p>");
             sb.append("<p> Version: ").append(h.getVersion()).append("</p>");
             sb.append("</div>");
