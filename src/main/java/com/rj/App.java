@@ -6,6 +6,8 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
 import org.jboss.logging.Logger;
 
+import static com.rj.constants.RjConstants.API_V1_HEALTH;
+
 public class App {
 
    private static final Logger logger = Logger.getLogger(App.class);
@@ -27,14 +29,14 @@ public class App {
                                     <body>
                                       <h1>ciao sono rj entra</h1>
                                     <hr>
-                                    <a href="/health">health</a>
+                                    <a href="/api/v1/health">health v1</a>
                                     </body>
                                     </html>
                                """
                     );
                 })
 
-                .get("/health", exchange -> {
+                .get(API_V1_HEALTH, exchange -> {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                     exchange.getResponseSender().send(hh.getInfo());
                 });
