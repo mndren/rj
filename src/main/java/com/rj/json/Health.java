@@ -38,7 +38,6 @@ public class Health {
         h.setStatus(status);
         h.setName(name);
         h.setVersion(version);
-
         return objectMapper.writeValueAsString(h);
 
     }

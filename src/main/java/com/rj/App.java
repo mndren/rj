@@ -1,6 +1,6 @@
 package com.rj;
 
-import com.rj.json.Health;
+import com.rj.handlers.HealthHandler;
 import io.undertow.Undertow;
 import io.undertow.server.RoutingHandler;
 import io.undertow.util.Headers;
@@ -10,28 +10,33 @@ public class App {
 
    private static final Logger logger = Logger.getLogger(App.class);
 
-    public static void start()
-    {
+    public static void start() {
+        HealthHandler hh = new HealthHandler();
+
         logger.info("sto partendo.....");
 
         RoutingHandler routes = new RoutingHandler()
                 .get("/", exchange -> {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
-                    exchange.getResponseSender().send("<html lang=\"it\">\n" +
-                            "<head>\n" +
-                            "    <title>RJ</title>\n" +
-                            "</head>\n" +
-                            "<body>\n" +
-                            "  <h1>ciao sono rj entra</h1>\n" +
-                            "<hr />\n" +
-                            "<a href=\"/health\">health</a>\n" +
-                            "</body>\n" +
-                            "</html>");
+                    exchange.getResponseSender().send(
+                            """
+                                    <html lang="it">
+                                    <head>
+                                        <title>RJ</title>
+                                    </head>
+                                    <body>
+                                      <h1>xciao sono rj entra</h1>
+                                    <br>
+                                    <a href="/health">health</a>
+                                    </body>
+                                    </html>
+                               """
+                    );
                 })
 
                 .get("/health", exchange -> {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                    exchange.getResponseSender().send(Health.toJson("ok", "renè", "1,0"));
+                    exchange.getResponseSender().send(hh.getInfo());
                 });
 
         Undertow server = Undertow.builder()
