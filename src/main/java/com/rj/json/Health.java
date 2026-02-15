@@ -32,13 +32,17 @@ public class Health {
     public String name;
     public String version;
 
-    public static String toJson(String status, String name, String version) throws JsonProcessingException {
+    public static String toJson(String status, String name, String version)  {
         ObjectMapper objectMapper = new ObjectMapper();
         Health h = new Health();
         h.setStatus(status);
         h.setName(name);
         h.setVersion(version);
-        return objectMapper.writeValueAsString(h);
+        try {
+            return objectMapper.writeValueAsString(h);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
