@@ -22,6 +22,10 @@ public class App {
         RoutingHandler routes = new RoutingHandler()
                 .get("/", exchange -> {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
+                    if (ru.getIndex().isBlank()) {
+                        exchange.setStatusCode(404);
+                        exchange.getResponseSender().send("Pagina non trovata");
+                    }
                     exchange.getResponseSender().send(ru.getIndex());
                 })
 
