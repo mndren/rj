@@ -1,6 +1,7 @@
 package com.rj;
 
 import com.rj.db.DataSource;
+import com.rj.handlers.ClientiHandler;
 import com.rj.handlers.FallbackHandler;
 import com.rj.handlers.HealthHandler;
 import com.rj.handlers.IndexHandler;
@@ -11,6 +12,7 @@ import io.undertow.server.RoutingHandler;
 import org.jboss.logging.Logger;
 
 import static com.rj.constants.RjConstants.API.API_V1_HEALTH;
+import static com.rj.constants.RjConstants.SSR.SSR_CLIENTI;
 import static com.rj.constants.RjConstants.SSR.SSR_HEALTH;
 
 public class App {
@@ -29,6 +31,7 @@ public class App {
         var fh = new FallbackHandler();
         var ih = new IndexHandler();
         var rp = new RjProperties();
+        var ch = new ClientiHandler();
 
 
         RoutingHandler routes = new RoutingHandler()
@@ -42,7 +45,10 @@ public class App {
                 // page
                 .get(SSR_HEALTH, hh::getPage)
                 // api
-                .get(API_V1_HEALTH, hh::getInfo);
+                .get(API_V1_HEALTH, hh::getInfo)
+
+                // CLienti
+                .get(SSR_CLIENTI, ch::getPage);
 
         // logging for all request
         var withLogging = new ReqLogging(routes);
