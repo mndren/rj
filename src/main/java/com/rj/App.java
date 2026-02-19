@@ -1,5 +1,6 @@
 package com.rj;
 
+import com.rj.db.DataSource;
 import com.rj.handlers.FallbackHandler;
 import com.rj.handlers.HealthHandler;
 import com.rj.handlers.IndexHandler;
@@ -17,10 +18,18 @@ public class App {
     private static final Logger logger = Logger.getLogger(App.class);
 
     public static void start() {
+
+        try {
+            DataSource.init();
+        } catch (Exception e) {
+            logger.error("errore inizializzazione DB. Arresto.", e);
+            System.exit(1);
+        }
         var hh = new HealthHandler();
         var fh = new FallbackHandler();
         var ih = new IndexHandler();
         var rp = new RjProperties();
+
 
         RoutingHandler routes = new RoutingHandler()
                 // fallback
@@ -42,6 +51,13 @@ public class App {
                 .addHttpListener(8080, "0.0.0.0")
                 .setHandler("true".equalsIgnoreCase(rp.getProp("req.logging")) ? withLogging : routes)
                 .build();
+
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("shutdown hook attivato...");
+            server.stop();
+            DataSource.shutdown();
+        }));
 
         server.start();
 
