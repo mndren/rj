@@ -27,7 +27,7 @@ public class Clienti {
 
 
     public static List<Clienti> listAll() {
-        String q = "select * from " + Clienti.class.getAnnotation(Table.class).name();
+        String q = "select * from " + Clienti.class.getAnnotation(Table.class).name() + " where 1=1";
         List<Clienti> clienti = new ArrayList<>();
         try (Connection connection = DataSource.getConnection(); PreparedStatement pst = connection.prepareStatement(q);
              ResultSet rs = pst.executeQuery()) {

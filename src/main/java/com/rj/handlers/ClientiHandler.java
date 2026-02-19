@@ -22,6 +22,7 @@ public class ClientiHandler {
             sb.append("<table>");
             sb.append("<thead>");
             sb.append("<tr>");
+            sb.append("<th></th>");
             sb.append("<th>ID</th>");
             sb.append("<th>Ragione Sociale</th>");
             sb.append("<th>Partita IVA</th>");
@@ -34,6 +35,7 @@ public class ClientiHandler {
 
             for (Clienti client : clientiList) {
                 sb.append("<tr>");
+                sb.append("<td>").append("<button>Modifica</button>").append("</td>");
                 sb.append("<td>").append(client.getId()).append("</td>");
                 sb.append("<td>").append(escape(client.getRagione_sociale())).append("</td>");
                 sb.append("<td>").append(escape(client.getPartita_iva())).append("</td>");
