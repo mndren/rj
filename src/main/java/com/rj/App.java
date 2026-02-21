@@ -12,8 +12,7 @@ import io.undertow.server.RoutingHandler;
 import org.jboss.logging.Logger;
 
 import static com.rj.constants.RjConstants.API.API_V1_HEALTH;
-import static com.rj.constants.RjConstants.SSR.SSR_CLIENTI;
-import static com.rj.constants.RjConstants.SSR.SSR_HEALTH;
+import static com.rj.constants.RjConstants.SSR.*;
 
 public class App {
 
@@ -33,13 +32,14 @@ public class App {
         var rp = new RjProperties();
         var ch = new ClientiHandler();
 
-
         RoutingHandler routes = new RoutingHandler()
                 // fallback
                 .setFallbackHandler(fh::getPage)
 
                 // index
                 .get("/", ih::getPage)
+                .get("/htmx.min.js", ih::getHtmx)
+                .get("/style.css", ih::getCss)
 
                 // health
                 // page
@@ -47,8 +47,17 @@ public class App {
                 // api
                 .get(API_V1_HEALTH, hh::getInfo)
 
-                // CLienti
-                .get(SSR_CLIENTI, ch::getPage);
+                // cLienti page
+                .get(SSR_CLIENTI, ch::list)
+                .get(SSR_CLIENTI_NEW, ch::newForm)
+                .get(SSR_CLIENTI_EDIT, ch::edit)
+
+                // clienti api
+                .post(SSR_CLIENTI, ch::insert)
+                .put(SSR_CLIENTI_ID, ch::update)
+                .get(SSR_CLIENTI_ID, ch::view)
+                .delete(SSR_CLIENTI_ID, ch::delete);
+
 
         // logging for all request
         var withLogging = new ReqLogging(routes);

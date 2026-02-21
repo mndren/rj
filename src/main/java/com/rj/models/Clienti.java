@@ -1,54 +1,39 @@
 package com.rj.models;
 
-import com.rj.annotations.Table;
-import com.rj.db.DataSource;
+import com.rj.business.BaseModel;
+import com.rj.business.annotations.Column;
+import com.rj.business.annotations.Label;
+import com.rj.business.annotations.OrderBy;
+import com.rj.business.annotations.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
+@OrderBy(value = "ragione_sociale desc")
 @Table(name = "clienti")
-public class Clienti {
+public class Clienti extends BaseModel<Clienti> {
+
+    @Column(id = true)
     public Long id;
+
+    @Label("Ragione Sociale")
     public String ragione_sociale;
+    @Label("Partita iva")
     public String partita_iva;
+    @Label("Codice Fiscale")
     public String codice_fiscale;
+    @Label("Email")
     public String email;
+    @Label("Telefono")
     public String telefono;
+    @Label("Indirizzo")
     public String indirizzo;
+
+    @Label(value = "Creato Il", visible = false)
     public LocalDate created_at;
 
-
-    public static List<Clienti> listAll() {
-        String q = "select * from " + Clienti.class.getAnnotation(Table.class).name() + " where 1=1";
-        List<Clienti> clienti = new ArrayList<>();
-        try (Connection connection = DataSource.getConnection(); PreparedStatement pst = connection.prepareStatement(q);
-             ResultSet rs = pst.executeQuery()) {
-            while (rs.next()) {
-                Clienti cli = new Clienti();
-                cli.id = rs.getLong(1);
-                cli.ragione_sociale = rs.getString("ragione_sociale");
-                cli.partita_iva = rs.getString("partita_iva");
-                cli.codice_fiscale = rs.getString("codice_fiscale");
-                cli.email = rs.getString("email");
-                cli.telefono = rs.getString("telefono");
-                cli.indirizzo = rs.getString("indirizzo");
-                cli.created_at = rs.getDate("created_at").toLocalDate();
-                clienti.add(cli);
-            }
-            return clienti;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return clienti;
-    }
 
 }

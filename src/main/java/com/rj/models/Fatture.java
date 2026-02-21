@@ -1,6 +1,8 @@
 package com.rj.models;
 
-import com.rj.annotations.Table;
+import com.rj.business.BaseModel;
+import com.rj.business.annotations.Column;
+import com.rj.business.annotations.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "fatture")
-public class Fatture {
+public class Fatture extends BaseModel<Fatture> {
+    @Column(id = true)
     public Long id;
     public Long ordine_id;
     public String numero_fattura;

@@ -26,7 +26,7 @@ public final class DataSource {
 
         var config = new HikariConfig("datasource.properties");
 
-        config.setMaximumPoolSize(10);
+        config.setMaximumPoolSize(100);
         config.setMinimumIdle(2);
         config.setConnectionTimeout(5000);
         config.setIdleTimeout(600000);

@@ -11,4 +11,18 @@ public class IndexHandler {
 
         RjUtility.sendHtml(e, RjConstants.RjResponse.Status.OK, html);
     }
+
+    public void getHtmx(HttpServerExchange httpServerExchange) {
+        String htmx = RjUtility.getHtmx();
+
+        RjUtility.sendHtmx(httpServerExchange, htmx);
+
+    }
+
+    public void getCss(HttpServerExchange httpServerExchange) {
+        String css = RjUtility.getStyle();
+
+        RjUtility.sendCss(httpServerExchange, css);
+
+    }
 }

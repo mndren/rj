@@ -5,7 +5,10 @@ import io.undertow.util.Headers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RjUtility {
 
@@ -20,6 +23,29 @@ public class RjUtility {
         }
     }
 
+    public static String getHtmx() {
+        try {
+            try (InputStream is = RjUtility.class.getClassLoader().getResourceAsStream("htmx.min.js")) {
+                if (is == null) return "";
+                return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getStyle() {
+        try {
+            try (InputStream is = RjUtility.class.getClassLoader().getResourceAsStream("style.css")) {
+                if (is == null) return "";
+                return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public static void sendHtml(HttpServerExchange ex, int code, String html) {
         ex.setStatusCode(code);
         ex.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html; charset=utf-8");
@@ -30,6 +56,42 @@ public class RjUtility {
         ex.setStatusCode(code);
         ex.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         ex.getResponseSender().send(json);
+    }
+
+    public static void sendHtmx(HttpServerExchange ex, String htmx) {
+        ex.setStatusCode(200);
+        ex.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/javascript; charset=utf-8");
+        ex.getResponseSender().send(htmx);
+    }
+
+    public static void sendCss(HttpServerExchange ex, String css) {
+        ex.setStatusCode(200);
+        ex.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/css; charset=utf-8");
+        ex.getResponseSender().send(css);
+    }
+
+
+    public static boolean redirectIfDirect(HttpServerExchange e) {
+        if (!e.getRequestHeaders().contains("HX-Request")) {
+            sendHtml(e, 200, getIndex());
+            return true;
+        }
+        return false;
+    }
+
+    public static Map<String, String> parseForm(String body) {
+        Map<String, String> map = new HashMap<>();
+        if (body == null || body.isBlank()) return map;
+
+        for (String pair : body.split("&")) {
+            String[] kv = pair.split("=", 2);
+            if (kv.length == 2) {
+                String key = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
+                String value = URLDecoder.decode(kv[1], StandardCharsets.UTF_8);
+                map.put(key, value);
+            }
+        }
+        return map;
     }
 
     public static boolean isBlank(String s) {

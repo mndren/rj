@@ -11,6 +11,9 @@ public class RjConstants {
     public static class SSR {
         public static final String SSR_HEALTH = "/health";
         public static final String SSR_CLIENTI = "/clienti";
+        public static final String SSR_CLIENTI_NEW = "/clienti/new";
+        public static final String SSR_CLIENTI_EDIT = "/clienti/{id}/edit";
+        public static final String SSR_CLIENTI_ID = "/clienti/{id}";
     }
 
     public static class RjResponse {

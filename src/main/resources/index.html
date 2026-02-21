@@ -1,49 +1,82 @@
 <!doctype html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>RJ</title>
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css">
+    <script src="htmx.min.js"></script>
+    <link rel="stylesheet" href="style.css"/>
 </head>
-
 <body>
-<main class="container">
-    <h1>RJ</h1>
-    <nav>
-        <ul>
-            <li>
-                <a href="#"
-                   hx-get="/clienti"
-                   hx-target="#content"
-                   hx-swap="innerHTML"
-                >Clienti</a>
-            </li>
-            <li>
-                <a href="#"
-                   hx-get="/users/new"
-                   hx-target="#content"
-                   hx-swap="innerHTML"
-                >Nuovo</a>
-            </li>
-            <li>
-                <a href="#"
-                   hx-get="/health"
-                   hx-target="#content"
-                   hx-swap="innerHTML"
-                >Health</a>
-            </li>
-        </ul>
-    </nav>
-    <hr/>
-    <div id="content"
-         hx-swap="innerHTML"
-    >
-        <p>Benvenuto su RJ</p>
-        <p>Seleziona una voce dal menu in alto</p>
+<div class="app">
+    <aside>
+        <div class="logo">RJ</div>
+        <nav>
+            <div class="nav-label">Anagrafiche</div>
+            <a class="nav-item" href="#"
+               hx-get="/clienti" hx-target="#content" hx-swap="innerHTML"
+               hx-push-url="true">Clienti</a>
+            <a class="nav-item" href="#"
+               hx-get="/clienti/new" hx-target="#content" hx-swap="innerHTML"
+               hx-push-url="true">Nuovo Cliente</a>
+
+            <div class="nav-label">Sistema</div>
+            <a class="nav-item" href="#"
+               hx-get="/health" hx-target="#content" hx-swap="innerHTML"
+               hx-push-url="true">Health</a>
+        </nav>
+    </aside>
+
+    <div class="content-area">
+        <div class="topbar">
+            <div class="loading" id="loader"></div>
+        </div>
+
+        <div id="content" hx-indicator="#loader">
+            <div class="welcome">
+                <h2>Benvenuto</h2>
+                <p>Seleziona una voce dal menu.</p>
+            </div>
+        </div>
     </div>
-</main>
+
+</div>
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function(e) {
+        const xhr = e.detail.xhr;
+        const title = xhr.getResponseHeader('HX-Page-Title');
+        const badge = xhr.getResponseHeader('HX-Page-Badge');
+
+        if (title) {
+            const path = badge
+                ? `<span style="color:var(--muted)">${badge}</span> / <span>${title}</span>`
+                : `<span>${title}</span>`;
+            document.getElementById('page-path').innerHTML = path;
+            document.title = 'RJ · ' + title;
+        }
+    });
+
+    document.body.addEventListener('htmx:beforeRequest', function(e) {
+        const el = e.detail.elt;
+        if (el.classList.contains('nav-item')) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+    });
+
+    document.body.addEventListener('htmx:historyRestore', function() {
+        const path = window.location.pathname;
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.toggle('active', el.getAttribute('hx-get') === path);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const path = window.location.pathname;
+        if (path !== '/') {
+            htmx.ajax('GET', path, { target: '#content', swap: 'innerHTML' });
+        }
+    });
+</script>
 </body>
 </html>

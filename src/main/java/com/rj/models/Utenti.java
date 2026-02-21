@@ -1,6 +1,6 @@
 package com.rj.models;
 
-import com.rj.annotations.Table;
+import com.rj.business.annotations.Table;
 import lombok.Getter;
 import lombok.Setter;
 
