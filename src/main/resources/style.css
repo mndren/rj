@@ -221,7 +221,7 @@ label {
 	letter-spacing: 0.06em;
 }
 
-input[type="text"] {
+input {
 	width: 100%;
 	border: 1px solid var(--border);
 	padding: 7px 10px;

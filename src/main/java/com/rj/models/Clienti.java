@@ -2,7 +2,7 @@ package com.rj.models;
 
 import com.rj.business.BaseModel;
 import com.rj.business.annotations.Column;
-import com.rj.business.annotations.Label;
+import com.rj.business.annotations.Form;
 import com.rj.business.annotations.OrderBy;
 import com.rj.business.annotations.Table;
 import lombok.Getter;
@@ -19,20 +19,20 @@ public class Clienti extends BaseModel<Clienti> {
     @Column(id = true)
     public Long id;
 
-    @Label("Ragione Sociale")
+    @Form("Ragione Sociale")
     public String ragione_sociale;
-    @Label("Partita iva")
+    @Form(value = "Partita iva", maxlength = "13", minlength = "11")
     public String partita_iva;
-    @Label("Codice Fiscale")
+    @Form(value = "Codice Fiscale", maxlength = "16", minlength = "16")
     public String codice_fiscale;
-    @Label("Email")
+    @Form(value = "Email", type = "email")
     public String email;
-    @Label("Telefono")
+    @Form(value = "Telefono", type = "tel", pattern = "[0-9]{10}", placeholder = "1234657879")
     public String telefono;
-    @Label("Indirizzo")
+    @Form("Indirizzo")
     public String indirizzo;
 
-    @Label(value = "Creato Il", visible = false)
+    @Form(value = "Creato Il", visible = false)
     public LocalDate created_at;
 
 

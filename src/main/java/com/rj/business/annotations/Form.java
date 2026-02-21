@@ -7,8 +7,20 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Label {
+public @interface Form {
     String value();
+
+    String type() default "text";
+
+    String maxlength() default "255";
+
+    String minlength() default "0";
+
+    boolean required() default false;
+
+    String pattern() default "";
+
+    String placeholder() default "";
 
     boolean visible() default true;
 }

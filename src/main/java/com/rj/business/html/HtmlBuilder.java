@@ -2,7 +2,7 @@ package com.rj.business.html;
 
 
 import com.rj.business.annotations.Column;
-import com.rj.business.annotations.Label;
+import com.rj.business.annotations.Form;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class HtmlBuilder {
     private static List<Field> tableFields(Class<?> clazz) {
         List<Field> result = new ArrayList<>();
         for (Field f : clazz.getFields()) {
-            Label lbl = f.getAnnotation(Label.class);
+            Form lbl = f.getAnnotation(Form.class);
             if (lbl != null && lbl.visible()) result.add(f);
         }
         return result;
@@ -33,7 +33,7 @@ public class HtmlBuilder {
     private static List<Field> allLabeledFields(Class<?> clazz) {
         List<Field> result = new ArrayList<>();
         for (Field f : clazz.getFields()) {
-            if (f.getAnnotation(Label.class) != null && f.getAnnotation(Label.class).visible()) result.add(f);
+            if (f.getAnnotation(Form.class) != null && f.getAnnotation(Form.class).visible()) result.add(f);
         }
         return result;
     }
@@ -60,9 +60,9 @@ public class HtmlBuilder {
 
         sb.append("<thead><tr>");
         for (Field f : fields) {
-            sb.append("<th>").append(esc(f.getAnnotation(Label.class).value())).append("</th>");
+            sb.append("<th>").append(esc(f.getAnnotation(Form.class).value())).append("</th>");
         }
-        
+
         sb.append("<th class=\"actions-col\">Azioni</th>");
         sb.append("</tr></thead>");
 
@@ -99,7 +99,7 @@ public class HtmlBuilder {
                 .append("hx-swap=\"innerHTML\">");
 
         for (Field f : fields) {
-            Label lbl = f.getAnnotation(Label.class);
+            Form frm = f.getAnnotation(Form.class);
             Column col = f.getAnnotation(Column.class);
             boolean isId = (col != null && col.id()) || f.getName().equals("id");
             boolean isReadonly = readonly || isId;
@@ -108,14 +108,28 @@ public class HtmlBuilder {
             String name = f.getName();
 
             sb.append("<div class=\"field-group\">");
-            sb.append("<label for=\"").append(name).append("\">").append(esc(lbl.value())).append("</label>");
+            sb.append("<label for=\"").append(name).append("\">").append(esc(frm.value())).append("</label>");
             sb.append("<input ")
-                    .append("type=\"text\" ")
                     .append("id=\"").append(name).append("\" ")
                     .append("name=\"").append(name).append("\" ")
                     .append("value=\"").append(value).append("\" ")
+                    .append("type=\"").append(frm.type()).append("\" ")
+                    .append("maxlength=\"").append(frm.maxlength()).append("\" ")
+                    .append("minlength=\"").append(frm.minlength()).append("\" ");
+
+            if (frm.placeholder() != null && !frm.placeholder().trim().isEmpty()) {
+                sb.append("placeholder=\"").append(frm.placeholder()).append("\" ");
+            }
+
+            if (frm.pattern() != null && !frm.pattern().trim().isEmpty()) {
+                sb.append("pattern=\"").append(frm.pattern()).append("\" ");
+            }
+            
+
+            sb.append(frm.required() ? "required" : "")
                     .append(isReadonly ? "readonly " : "")
                     .append("/>");
+
             sb.append("</div>");
         }
 
