@@ -216,4 +216,37 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
         }
     }
 
+    @Override
+    public List<T> listAllFiltered(Map<String, String> filters) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM ").append(tableName()).append(" WHERE 1=1");
+        List<String> values = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            if (entry.getValue() != null && !entry.getValue().isBlank()) {
+                sql.append(" AND ").append(entry.getKey()).append(" ILIKE ?");
+                values.add("%" + entry.getValue() + "%");
+            }
+        }
+
+        List<T> result = new ArrayList<>();
+        try (Connection c = DataSource.getConnection();
+             PreparedStatement pst = c.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < values.size(); i++) {
+                pst.setString(i + 1, values.get(i));
+            }
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    T obj = newInstance();
+                    for (Field f : getFields()) obj.setFieldFromRs(f, rs);
+                    result.add(obj);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 }

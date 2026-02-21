@@ -59,26 +59,29 @@ public class HtmlBuilder {
 
 
         sb.append("<thead><tr>");
+        sb.append("<th class=\"actions-col\">Azioni</th>");
         for (Field f : fields) {
             sb.append("<th>").append(esc(f.getAnnotation(Form.class).value())).append("</th>");
         }
 
-        sb.append("<th class=\"actions-col\">Azioni</th>");
         sb.append("</tr></thead>");
 
         sb.append("<tbody>");
+
         for (T row : rows) {
             String rowId = getFieldValue(row, id);
             sb.append("<tr>");
-            for (Field f : fields) {
-                sb.append("<td>").append(esc(getFieldValue(row, f))).append("</td>");
-            }
 
             sb.append("<td class=\"actions-cell\">");
             sb.append(btnView(baseRoute + "/" + rowId, hxTarget));
             sb.append(btnEdit(baseRoute + "/" + rowId + "/edit", hxTarget));
             sb.append(btnDelete(baseRoute + "/" + rowId, hxTarget));
             sb.append("</td>");
+
+            for (Field f : fields) {
+                sb.append("<td>").append(esc(getFieldValue(row, f))).append("</td>");
+            }
+
             sb.append("</tr>");
         }
         sb.append("</tbody></table></div>");
@@ -124,10 +127,10 @@ public class HtmlBuilder {
             if (frm.pattern() != null && !frm.pattern().trim().isEmpty()) {
                 sb.append("pattern=\"").append(frm.pattern()).append("\" ");
             }
-            
 
             sb.append(frm.required() ? "required" : "")
                     .append(isReadonly ? "readonly " : "")
+                    .append(frm.autofocus() ? "autofocus" : "")
                     .append("/>");
 
             sb.append("</div>");
@@ -158,6 +161,26 @@ public class HtmlBuilder {
         return sb.toString();
     }
 
+    public static String filters(String action, String hxTarget, FilterField... fields) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div class=\"filters\">");
+
+        for (FilterField f : fields) {
+            sb.append("<input type=\"text\" ")
+                    .append("name=\"").append(f.name()).append("\" ")
+                    .append("placeholder=\"").append(esc(f.placeholder())).append("\" ")
+                    .append("value=\"").append(esc(f.value())).append("\" ")
+                    .append("hx-get=\"").append(action).append("\" ")
+                    .append("hx-target=\"").append(hxTarget).append("\" ")
+                    .append("hx-swap=\"innerHTML\" ")
+                    .append("hx-include=\"closest div\" ")
+                    .append("/>");
+        }
+
+        sb.append("</div>");
+        return sb.toString();
+    }
+
 
     public static String toolbar(String newRoute, String hxTarget, String label) {
         return "<div class=\"toolbar\">" +
@@ -166,6 +189,17 @@ public class HtmlBuilder {
                 "hx-target=\"" + hxTarget + "\" " +
                 "hx-swap=\"innerHTML\">" +
                 "+ " + esc(label) +
+                "</button></div>";
+    }
+
+    public static String toolbarBackToList(String newRoute, String hxTarget, String label) {
+        return "<div class=\"toolbar\">" +
+                "<button class=\"btn btn-primary\" " +
+                "hx-get=\"" + newRoute + "\" " +
+                "hx-target=\"" + hxTarget + "\" " +
+                "hx-push-url=\"true\" " +
+                "hx-swap=\"innerHTML\">" +
+                esc(label) +
                 "</button></div>";
     }
 

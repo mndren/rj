@@ -1,6 +1,7 @@
 package com.rj.business;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface Db<T> {
@@ -13,5 +14,6 @@ public interface Db<T> {
     boolean update();
 
     boolean delete();
-    
+
+    List<T> listAllFiltered(Map<String, String> filters);
 }

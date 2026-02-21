@@ -1,5 +1,6 @@
 package com.rj.handlers;
 
+import com.rj.business.html.FilterField;
 import com.rj.business.html.HtmlBuilder;
 import com.rj.constants.RjConstants;
 import com.rj.models.Clienti;
@@ -9,26 +10,44 @@ import io.undertow.server.HttpServerExchange;
 import java.util.List;
 import java.util.Map;
 
+import static com.rj.constants.RjConstants.SSR.DEFAULT_TARGET;
+import static com.rj.constants.RjConstants.SSR.SSR_CLIENTI;
 import static io.undertow.util.HttpString.tryFromString;
 
 public class ClientiHandler {
 
-
-    private static final String TARGET = "#content";
-    private static final String BASE = "/clienti";
-
     public void list(HttpServerExchange e) {
         if (RjUtility.redirectIfDirect(e)) return;
-        List<Clienti> rows = new Clienti().listAll();
+        String ragioneSociale = queryParam(e, "ragione_sociale");
+        String email = queryParam(e, "email");
+        String partitaIva = queryParam(e, "partita_iva");
+
+        Map<String, String> filters = Map.of(
+                "ragione_sociale", ragioneSociale,
+                "email", email,
+                "partita_iva", partitaIva
+        );
+        List<Clienti> rows = new Clienti().listAllFiltered(filters);
 
         String html = HtmlBuilder.page(
                 "Clienti",
                 rows.size() + " record trovati",
-                HtmlBuilder.toolbar(BASE + "/new", TARGET, "Nuovo Cliente"),
-                HtmlBuilder.table(rows, BASE, TARGET)
+                HtmlBuilder.filters(SSR_CLIENTI, DEFAULT_TARGET,
+                        new FilterField("ragione_sociale", "Ragione sociale", ragioneSociale),
+                        new FilterField("email", "Email", email),
+                        new FilterField("partita_iva", "Partita Iva", partitaIva)
+                ),
+                HtmlBuilder.toolbar(SSR_CLIENTI + "/new", DEFAULT_TARGET, "Nuovo Cliente"),
+                HtmlBuilder.table(rows, SSR_CLIENTI, DEFAULT_TARGET)
         );
 
-        RjUtility.sendHtml(e, RjConstants.RjResponse.Status.OK, html);
+        RjUtility.sendHtml(e, 200, html);
+    }
+
+    private String queryParam(HttpServerExchange e, String name) {
+
+        var params = e.getQueryParameters().get(name);
+        return (params != null && !params.isEmpty()) ? params.getFirst() : "";
     }
 
     public void view(HttpServerExchange e) {
@@ -38,7 +57,8 @@ public class ClientiHandler {
 
         String html = HtmlBuilder.page(
                 "Cliente #" + id, "",
-                HtmlBuilder.form(c, Clienti.class, BASE + "/" + id + "/edit", "get", true, TARGET)
+                HtmlBuilder.toolbarBackToList(SSR_CLIENTI, DEFAULT_TARGET, "Ritorna alla lista"),
+                HtmlBuilder.form(c, Clienti.class, SSR_CLIENTI + "/" + id + "/edit", "get", true, DEFAULT_TARGET)
         );
 
         RjUtility.sendHtml(e, RjConstants.RjResponse.Status.OK, html);
@@ -51,7 +71,9 @@ public class ClientiHandler {
 
         String html = HtmlBuilder.page(
                 "Modifica Cliente #" + id, "",
-                HtmlBuilder.form(c, Clienti.class, BASE + "/" + id, "put", false, TARGET)
+                HtmlBuilder.toolbarBackToList(SSR_CLIENTI, DEFAULT_TARGET, "Ritorna alla lista"),
+                HtmlBuilder.form(c, Clienti.class, SSR_CLIENTI + "/" + id, "put", false, DEFAULT_TARGET)
+
         );
 
         RjUtility.sendHtml(e, RjConstants.RjResponse.Status.OK, html);
@@ -61,7 +83,8 @@ public class ClientiHandler {
         if (RjUtility.redirectIfDirect(e)) return;
         String html = HtmlBuilder.page(
                 "Nuovo Cliente", "",
-                HtmlBuilder.form(null, Clienti.class, BASE, "post", false, TARGET)
+                HtmlBuilder.toolbarBackToList(SSR_CLIENTI, DEFAULT_TARGET, "Ritorna alla lista"),
+                HtmlBuilder.form(null, Clienti.class, SSR_CLIENTI, "post", false, DEFAULT_TARGET)
         );
 
         RjUtility.sendHtml(e, RjConstants.RjResponse.Status.OK, html);
@@ -88,7 +111,7 @@ public class ClientiHandler {
 
             if (ok) {
                 exchange.getResponseHeaders().put(
-                        tryFromString("HX-Redirect"), BASE
+                        tryFromString("HX-Redirect"), SSR_CLIENTI
                 );
                 RjUtility.sendHtml(exchange, 204, "");
             } else {
@@ -115,7 +138,7 @@ public class ClientiHandler {
 
             if (ok) {
                 exchange.getResponseHeaders().put(
-                        tryFromString("HX-Redirect"), BASE
+                        tryFromString("HX-Redirect"), SSR_CLIENTI
                 );
                 RjUtility.sendHtml(exchange, 204, "");
             } else {
@@ -131,7 +154,7 @@ public class ClientiHandler {
         boolean ok = c.delete();
         if (ok) {
             e.getResponseHeaders().put(
-                    tryFromString("HX-Redirect"), BASE
+                    tryFromString("HX-Redirect"), SSR_CLIENTI
             );
             RjUtility.sendHtml(e, 204, "");
         } else {

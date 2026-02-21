@@ -269,3 +269,16 @@ input[readonly] {
 	color: var(--text);
 	margin-bottom: 4px;
 }
+
+.filters {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.filters input {
+    width: auto;
+    flex: 1;
+    max-width: 220px;
+}

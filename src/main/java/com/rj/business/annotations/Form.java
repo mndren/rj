@@ -16,11 +16,13 @@ public @interface Form {
 
     String minlength() default "0";
 
-    boolean required() default false;
-
     String pattern() default "";
 
     String placeholder() default "";
 
+    boolean autofocus() default false;
+
+    boolean required() default false;
+    
     boolean visible() default true;
 }

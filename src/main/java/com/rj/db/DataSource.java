@@ -85,4 +85,17 @@ public final class DataSource {
             throw new RuntimeException("Errore esecuzione script SQL", e);
         }
     }
+
+    public boolean createTable(String sql) {
+        if (ds == null) {
+            throw new IllegalStateException("datasource non inizializzato");
+        }
+        try (var conn = getConnection(); var stmt = conn.prepareStatement(sql)) {
+            return stmt.execute(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+
 }

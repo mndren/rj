@@ -9,6 +9,7 @@ public class RjConstants {
     }
 
     public static class SSR {
+        public static final String DEFAULT_TARGET = "#content";
         public static final String SSR_HEALTH = "/health";
         public static final String SSR_CLIENTI = "/clienti";
         public static final String SSR_CLIENTI_NEW = "/clienti/new";

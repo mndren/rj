@@ -19,7 +19,7 @@ public class Clienti extends BaseModel<Clienti> {
     @Column(id = true)
     public Long id;
 
-    @Form("Ragione Sociale")
+    @Form(value = "Ragione Sociale", autofocus = true)
     public String ragione_sociale;
     @Form(value = "Partita iva", maxlength = "13", minlength = "11")
     public String partita_iva;
