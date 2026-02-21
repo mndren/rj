@@ -5,6 +5,7 @@ import com.rj.business.annotations.Column;
 import com.rj.business.annotations.OrderBy;
 import com.rj.business.annotations.Table;
 import com.rj.db.DataSource;
+import org.jboss.logging.Logger;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -14,6 +15,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
+
+    private static final Logger logger = Logger.getLogger(BaseModel.class);
 
     private String tableName() {
         Table ann = this.getClass().getAnnotation(Table.class);
@@ -72,9 +75,16 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
     private void setParamFromField(PreparedStatement pst, int idx, Field f) throws Exception {
         f.setAccessible(true);
         Object val = f.get(this);
-        if (val == null) pst.setNull(idx, Types.NULL);
-        else if (val instanceof LocalDate) pst.setDate(idx, Date.valueOf((LocalDate) val));
-        else pst.setObject(idx, val);
+        switch (val) {
+            case null -> pst.setNull(idx, Types.NULL);
+            case LocalDate localDate -> pst.setDate(idx, Date.valueOf(localDate));
+            case BigDecimal bigDecimal -> pst.setBigDecimal(idx, bigDecimal);
+            case String s -> {
+                if ("".equals(val)) pst.setNull(idx, Types.VARCHAR);
+                else pst.setString(idx, s);
+            }
+            default -> pst.setObject(idx, val);
+        }
     }
 
 
@@ -96,12 +106,15 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
              PreparedStatement pst = c.prepareStatement(sql);
              ResultSet rs = pst.executeQuery()) {
 
+            loggingQuery(sql);
+
             List<Field> fields = getFields();
             while (rs.next()) {
                 T obj = newInstance();
                 for (Field f : fields) obj.setFieldFromRs(f, rs);
                 result.add(obj);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -117,12 +130,15 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
 
             pst.setLong(1, id);
             try (ResultSet rs = pst.executeQuery()) {
+                loggingQuery(pst.toString().split("wrapping")[1]);
                 if (rs.next()) {
                     T obj = newInstance();
                     for (Field f : getFields()) obj.setFieldFromRs(f, rs);
                     return Optional.of(obj);
                 }
+
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -162,7 +178,10 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                     idField.set(this, keys.getLong(1));
                 }
             }
-            return rows > 0;
+            if (rows > 0) {
+                loggingQuery(pst.toString().split("wrapping")[1]);
+                return true;
+            } else return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -193,7 +212,10 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             idField.setAccessible(true);
             pst.setObject(updatable.size() + 1, idField.get(this));
 
-            return pst.executeUpdate() > 0;
+            if (pst.executeUpdate() > 0) {
+                loggingQuery(pst.toString().split("wrapping")[1]);
+                return true;
+            } else return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -209,7 +231,11 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
 
             idField.setAccessible(true);
             pst.setObject(1, idField.get(this));
-            return pst.executeUpdate() > 0;
+
+            if (pst.executeUpdate() > 0) {
+                loggingQuery(pst.toString().split("wrapping")[1]);
+                return true;
+            } else return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -228,6 +254,8 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             }
         }
 
+        if (getOrderBy() != null) sql.append(" ORDER BY ").append(getOrderBy());
+
         List<T> result = new ArrayList<>();
         try (Connection c = DataSource.getConnection();
              PreparedStatement pst = c.prepareStatement(sql.toString())) {
@@ -243,10 +271,16 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                     result.add(obj);
                 }
             }
+            loggingQuery(sql.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
+    }
+
+
+    private void loggingQuery(String sql) {
+        logger.info(sql);
     }
 
 }
