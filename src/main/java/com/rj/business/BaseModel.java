@@ -130,7 +130,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
 
             pst.setLong(1, id);
             try (ResultSet rs = pst.executeQuery()) {
-                loggingQuery(pst.toString().split("wrapping")[1]);
+                loggingQuery(pst);
                 if (rs.next()) {
                     T obj = newInstance();
                     for (Field f : getFields()) obj.setFieldFromRs(f, rs);
@@ -179,7 +179,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                 }
             }
             if (rows > 0) {
-                loggingQuery(pst.toString().split("wrapping")[1]);
+                loggingQuery(pst);
                 return true;
             } else return false;
         } catch (Exception e) {
@@ -213,7 +213,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             pst.setObject(updatable.size() + 1, idField.get(this));
 
             if (pst.executeUpdate() > 0) {
-                loggingQuery(pst.toString().split("wrapping")[1]);
+                loggingQuery(pst);
                 return true;
             } else return false;
         } catch (Exception e) {
@@ -233,7 +233,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             pst.setObject(1, idField.get(this));
 
             if (pst.executeUpdate() > 0) {
-                loggingQuery(pst.toString().split("wrapping")[1]);
+                loggingQuery(pst);
                 return true;
             } else return false;
         } catch (Exception e) {
@@ -271,7 +271,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                     result.add(obj);
                 }
             }
-            loggingQuery(sql.toString());
+            loggingQuery(pst);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -279,8 +279,17 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
     }
 
 
-    private void loggingQuery(String sql) {
-        logger.info(sql);
+    private void loggingQuery(Object sql) {
+        switch (sql) {
+            case null -> {
+                return;
+            }
+            case String s -> logger.info(s);
+            case PreparedStatement preparedStatement -> logger.info(preparedStatement.toString().split("wrapping")[1]);
+            case StringBuilder stringBuilder -> logger.info(stringBuilder.toString());
+            default -> {
+            }
+        }
     }
 
 }
