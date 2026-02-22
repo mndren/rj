@@ -23,6 +23,8 @@ public @interface Form {
     boolean autofocus() default false;
 
     boolean required() default false;
-    
+
+    boolean hideValueInTable() default false;
+
     boolean visible() default true;
 }

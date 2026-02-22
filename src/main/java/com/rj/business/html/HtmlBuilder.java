@@ -69,7 +69,7 @@ public class HtmlBuilder {
         sb.append("<tbody>");
 
         for (T row : rows) {
-            String rowId = getFieldValue(row, id);
+            String rowId = getFieldValue(row, id, false);
             sb.append("<tr>");
 
             sb.append("<td class=\"actions-cell\">");
@@ -79,7 +79,7 @@ public class HtmlBuilder {
             sb.append("</td>");
 
             for (Field f : fields) {
-                sb.append("<td>").append(esc(getFieldValue(row, f))).append("</td>");
+                sb.append("<td>").append(esc(getFieldValue(row, f, false))).append("</td>");
             }
 
             sb.append("</tr>");
@@ -107,7 +107,7 @@ public class HtmlBuilder {
             boolean isId = (col != null && col.id()) || f.getName().equals("id");
             boolean isReadonly = readonly || isId;
 
-            String value = obj != null ? esc(getFieldValue(obj, f)) : "";
+            String value = obj != null ? esc(getFieldValue(obj, f, true)) : "";
             String name = f.getName();
 
             sb.append("<div class=\"field-group\">");
@@ -128,7 +128,7 @@ public class HtmlBuilder {
                 sb.append("pattern=\"").append(frm.pattern()).append("\" ");
             }
 
-            sb.append(frm.required() ? "required" : "")
+            sb.append(frm.required() ? "required " : "")
                     .append(isReadonly ? "readonly " : "")
                     .append(frm.autofocus() ? "autofocus" : "")
                     .append("/>");
@@ -232,10 +232,16 @@ public class HtmlBuilder {
     }
 
 
-    private static String getFieldValue(Object obj, Field f) {
+    private static String getFieldValue(Object obj, Field f, boolean isForm) {
         try {
             f.setAccessible(true);
             Object val = f.get(obj);
+            if (!isForm) {
+                Form frm = f.getAnnotation(Form.class);
+                if (frm != null && "password".equalsIgnoreCase(frm.type())) {
+                    return val != null ? "**********" : "";
+                }
+            }
             return val != null ? val.toString() : "";
         } catch (Exception e) {
             return "";

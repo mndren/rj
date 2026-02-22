@@ -17,7 +17,7 @@ public class Utenti extends BaseModel<Utenti> {
     public Long id;
     @Form(value = "Username", autofocus = true)
     public String username;
-    @Form(value = "Password", type = "password", required = true)
+    @Form(value = "Password", type = "password", required = true, hideValueInTable = true)
     public String password_hash;
     @Form(value = "Ruolo", type = "ruolo")
     public String ruolo;
