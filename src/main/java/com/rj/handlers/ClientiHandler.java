@@ -4,6 +4,7 @@ import com.rj.business.html.FilterField;
 import com.rj.business.html.HtmlBuilder;
 import com.rj.constants.RjConstants;
 import com.rj.models.Clienti;
+import com.rj.utility.RjLogger;
 import com.rj.utility.RjUtility;
 import io.undertow.server.HttpServerExchange;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import static com.rj.constants.RjConstants.SSR.DEFAULT_TARGET;
 import static com.rj.constants.RjConstants.SSR.SSR_CLIENTI;
+import static com.rj.utility.RjUtility.queryParam;
 import static io.undertow.util.HttpString.tryFromString;
 
 public class ClientiHandler {
@@ -44,11 +46,6 @@ public class ClientiHandler {
         RjUtility.sendHtml(e, 200, html);
     }
 
-    private String queryParam(HttpServerExchange e, String name) {
-
-        var params = e.getQueryParameters().get(name);
-        return (params != null && !params.isEmpty()) ? params.getFirst() : "";
-    }
 
     public void view(HttpServerExchange e) {
         if (RjUtility.redirectIfDirect(e)) return;
@@ -114,7 +111,9 @@ public class ClientiHandler {
                         tryFromString("HX-Redirect"), SSR_CLIENTI
                 );
                 RjUtility.sendHtml(exchange, 204, "");
+                RjLogger.info("Inserito cliente con ragione sociale: " + c.ragione_sociale, "ClientiHandler.insert");
             } else {
+                RjLogger.info("Errore inserendo cliente con ragione sociale: " + c.ragione_sociale, "ClientiHandler.insert");
                 RjUtility.sendHtml(exchange, 500, "<p>Errore durante il salvataggio.</p>");
             }
         });
@@ -140,8 +139,10 @@ public class ClientiHandler {
                 exchange.getResponseHeaders().put(
                         tryFromString("HX-Redirect"), SSR_CLIENTI
                 );
+                RjLogger.info("Modificato cliente con ragione sociale: " + c.ragione_sociale, "ClientiHandler.update");
                 RjUtility.sendHtml(exchange, 204, "");
             } else {
+                RjLogger.error("Errore modificando il cliente con ragione sociale: " + c.ragione_sociale, "ClientiHandler.update");
                 RjUtility.sendHtml(exchange, 500, "<p>Errore durante l'aggiornamento.</p>");
             }
         });
@@ -156,8 +157,10 @@ public class ClientiHandler {
             e.getResponseHeaders().put(
                     tryFromString("HX-Redirect"), SSR_CLIENTI
             );
+            RjLogger.info("Eliminato il cliente con ragione sociale: " + c.ragione_sociale, "ClientiHandler.delete");
             RjUtility.sendHtml(e, 204, "");
         } else {
+            RjLogger.error("Errore eliminando il cliente con ragione sociale: " + c.ragione_sociale, "ClientiHandler.delete");
             RjUtility.sendHtml(e, 500, "<p>Errore durante l'eliminazione.</p>");
         }
 

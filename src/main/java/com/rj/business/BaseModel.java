@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
-
     private static final Logger logger = Logger.getLogger(BaseModel.class);
 
     private String tableName() {
@@ -69,8 +69,12 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
         } else if (type == BigDecimal.class) {
             BigDecimal bd = rs.getBigDecimal(col);
             f.set(this, bd);
+        } else if (type == LocalDateTime.class) {
+            LocalDateTime ldt = rs.getTimestamp(col).toLocalDateTime();
+            if (ldt != null) f.set(this, ldt);
         }
     }
+
 
     private void setParamFromField(PreparedStatement pst, int idx, Field f) throws Exception {
         f.setAccessible(true);
@@ -178,10 +182,8 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                     idField.set(this, keys.getLong(1));
                 }
             }
-            if (rows > 0) {
-                loggingQuery(pst);
-                return true;
-            } else return false;
+            loggingQuery(pst);
+            return rows > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -212,10 +214,10 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             idField.setAccessible(true);
             pst.setObject(updatable.size() + 1, idField.get(this));
 
-            if (pst.executeUpdate() > 0) {
-                loggingQuery(pst);
-                return true;
-            } else return false;
+            loggingQuery(pst);
+
+            return pst.executeUpdate() > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -232,10 +234,9 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             idField.setAccessible(true);
             pst.setObject(1, idField.get(this));
 
-            if (pst.executeUpdate() > 0) {
-                loggingQuery(pst);
-                return true;
-            } else return false;
+            loggingQuery(pst);
+
+            return pst.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -250,7 +251,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isBlank()) {
                 sql.append(" AND ").append(entry.getKey()).append(" ILIKE ?");
-                values.add("%" + entry.getValue() + "%");
+                values.add("%" + entry.getValue().toLowerCase() + "%");
             }
         }
 
@@ -264,6 +265,8 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                 pst.setString(i + 1, values.get(i));
             }
 
+            loggingQuery(pst);
+
             try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
                     T obj = newInstance();
@@ -271,7 +274,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
                     result.add(obj);
                 }
             }
-            loggingQuery(pst);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -291,5 +294,4 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             }
         }
     }
-
 }

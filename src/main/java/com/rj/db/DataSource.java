@@ -49,6 +49,8 @@ public final class DataSource {
         if (Boolean.parseBoolean(rjProperties.getProp("sql.import"))) {
             runSqlScript("import.sql");
         }
+
+
     }
 
     public static Connection getConnection() throws SQLException {

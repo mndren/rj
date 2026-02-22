@@ -214,7 +214,7 @@ public class HtmlBuilder {
     }
 
     public static String btnEdit(String route, String hxTarget) {
-        return "<button class=\"btn btn-sm btn-outline\" " +
+        return "<button class=\"btn btn-sm btn-outline ml-2\" " +
                 "hx-get=\"" + route + "\" " +
                 "hx-target=\"" + hxTarget + "\" " +
                 "hx-swap=\"innerHTML\" " +
@@ -223,7 +223,7 @@ public class HtmlBuilder {
     }
 
     public static String btnDelete(String route, String hxTarget) {
-        return "<button class=\"btn btn-sm btn-danger\" " +
+        return "<button class=\"btn btn-sm btn-danger ml-2\" " +
                 "hx-delete=\"" + route + "\" " +
                 "hx-target=\"" + hxTarget + "\" " +
                 "hx-swap=\"outerHTML\" " +

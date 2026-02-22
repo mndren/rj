@@ -1,10 +1,7 @@
 package com.rj;
 
 import com.rj.db.DataSource;
-import com.rj.handlers.ClientiHandler;
-import com.rj.handlers.FallbackHandler;
-import com.rj.handlers.HealthHandler;
-import com.rj.handlers.IndexHandler;
+import com.rj.handlers.*;
 import com.rj.net.ReqLogging;
 import com.rj.utility.RjProperties;
 import io.undertow.Undertow;
@@ -31,23 +28,28 @@ public class App {
         var ih = new IndexHandler();
         var rp = new RjProperties();
         var ch = new ClientiHandler();
+        var lh = new LogHandler();
+        var uh = new UtentiHandler();
 
         RoutingHandler routes = new RoutingHandler()
                 // fallback
                 .setFallbackHandler(fh::getPage)
+
+                // logs
+                .get(SSR_LOGS, lh::list)
+                .get(SSR_LOGS_TABLE, lh::table)
 
                 // index
                 .get("/", ih::getPage)
                 .get("/htmx.min.js", ih::getHtmx)
                 .get("/style.css", ih::getCss)
 
-                // health
-                // page
+                // health page
                 .get(SSR_HEALTH, hh::getPage)
-                // api
+                // health api
                 .get(API_V1_HEALTH, hh::getInfo)
 
-                // cLienti page
+                // clienti page
                 .get(SSR_CLIENTI, ch::list)
                 .get(SSR_CLIENTI_NEW, ch::newForm)
                 .get(SSR_CLIENTI_EDIT, ch::edit)
@@ -56,8 +58,18 @@ public class App {
                 .post(SSR_CLIENTI, ch::insert)
                 .put(SSR_CLIENTI_ID, ch::update)
                 .get(SSR_CLIENTI_ID, ch::view)
-                .delete(SSR_CLIENTI_ID, ch::delete);
+                .delete(SSR_CLIENTI_ID, ch::delete)
 
+                // utenti page
+                .get(SSR_UTENTI, uh::list)
+                .get(SSR_UTENTI_NEW, uh::newForm)
+                .get(SSR_UTENTI_EDIT, uh::edit)
+
+                // utenti api
+                .post(SSR_UTENTI, uh::insert)
+                .put(SSR_UTENTI_ID, uh::update)
+                .get(SSR_UTENTI_ID, uh::view)
+                .delete(SSR_UTENTI_ID, uh::delete);
 
         // logging for all request
         var withLogging = new ReqLogging(routes);

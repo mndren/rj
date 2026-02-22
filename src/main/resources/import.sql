@@ -101,36 +101,48 @@ CREATE TABLE IF NOT EXISTS utenti (
     );
 
 -- ===============================
+-- LOGS
+-- ===============================
+CREATE TABLE IF NOT EXISTS rj_logs (
+    id              BIGSERIAL PRIMARY KEY,
+    date            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    level           VARCHAR(50) NOT NULL,
+    error           TEXT,
+    ctx             TEXT
+    );
+
+
+-- ===============================
 -- DATI REALISTICI MASSIVI
 -- ===============================
 
 -- CLIENTI (50)
-INSERT INTO clienti (ragione_sociale, partita_iva, email)
-SELECT
-    'Cliente ' || gs,
-    LPAD(gs::text, 11, '0'),
-    'cliente' || gs || '@mail.it'
-FROM generate_series(1,50) gs
-    ON CONFLICT DO NOTHING;
-
--- PRODOTTI (100)
-INSERT INTO prodotti (codice, nome, prezzo)
-SELECT
-    'PRD' || gs,
-    'Prodotto ' || gs,
-    ROUND((random() * 500 + 10)::numeric, 2)
-FROM generate_series(1,100) gs
-    ON CONFLICT DO NOTHING;
-
--- ORDINI (200)
-INSERT INTO ordini (cliente_id, stato)
-SELECT
-    (random() * 49 + 1)::int,
-    CASE
-        WHEN random() < 0.5 THEN 'CREATO'
-        WHEN random() < 0.8 THEN 'CONFERMATO'
-        ELSE 'FATTURATO'
-        END
-FROM generate_series(1,200);
+-- INSERT INTO clienti (ragione_sociale, partita_iva, email)
+-- SELECT
+--     'Cliente ' || gs,
+--     LPAD(gs::text, 11, '0'),
+--     'cliente' || gs || '@mail.it'
+-- FROM generate_series(1,50) gs
+--     ON CONFLICT DO NOTHING;
+--
+-- -- PRODOTTI (100)
+-- INSERT INTO prodotti (codice, nome, prezzo)
+-- SELECT
+--     'PRD' || gs,
+--     'Prodotto ' || gs,
+--     ROUND((random() * 500 + 10)::numeric, 2)
+-- FROM generate_series(1,100) gs
+--     ON CONFLICT DO NOTHING;
+--
+-- -- ORDINI (200)
+-- INSERT INTO ordini (cliente_id, stato)
+-- SELECT
+--     (random() * 49 + 1)::int,
+--     CASE
+--         WHEN random() < 0.5 THEN 'CREATO'
+--         WHEN random() < 0.8 THEN 'CONFERMATO'
+--         ELSE 'FATTURATO'
+--         END
+-- FROM generate_series(1,200);
 
 COMMIT;

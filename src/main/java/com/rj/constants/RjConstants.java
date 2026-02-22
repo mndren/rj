@@ -11,10 +11,16 @@ public class RjConstants {
     public static class SSR {
         public static final String DEFAULT_TARGET = "#content";
         public static final String SSR_HEALTH = "/health";
+        public static final String SSR_LOGS = "/logs";
+        public static final String SSR_LOGS_TABLE = "/logs/table";
         public static final String SSR_CLIENTI = "/clienti";
         public static final String SSR_CLIENTI_NEW = "/clienti/new";
         public static final String SSR_CLIENTI_EDIT = "/clienti/{id}/edit";
         public static final String SSR_CLIENTI_ID = "/clienti/{id}";
+        public static final String SSR_UTENTI = "/utenti";
+        public static final String SSR_UTENTI_NEW = "/utenti/new";
+        public static final String SSR_UTENTI_EDIT = "/utenti/{id}/edit";
+        public static final String SSR_UTENTI_ID = "/utenti/{id}";
     }
 
     public static class RjResponse {
