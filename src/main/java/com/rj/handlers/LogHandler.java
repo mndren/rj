@@ -22,7 +22,7 @@ public class LogHandler {
         String error = queryParam(e, "error");
 
         Map<String, String> filters = Map.of(
-                "", context,
+                "ctx", context,
                 "error", error
         );
 

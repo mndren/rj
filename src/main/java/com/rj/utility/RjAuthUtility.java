@@ -1,19 +1,18 @@
 package com.rj.utility;
 
-import com.rj.db.DataSource;
+import com.rj.models.Sessioni;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+@Slf4j
 public class RjAuthUtility {
 
     public static String hashPassword(String password) {
@@ -35,14 +34,13 @@ public class RjAuthUtility {
     public static void createSession(HttpServerExchange e, Long utenteId, String username) {
         String token = generateToken();
         LocalDateTime expires = LocalDateTime.now().plusHours(8);
-
-        try (Connection c = DataSource.getConnection();
-             PreparedStatement pst = c.prepareStatement(
-                     "INSERT INTO sessioni (token, utente_id, expires_at) VALUES (?, ?, ?)")) {
-            pst.setString(1, token);
-            pst.setLong(2, utenteId);
-            pst.setObject(3, expires);
-            pst.executeUpdate();
+        
+        try {
+            Sessioni s = new Sessioni();
+            s.setToken(token);
+            s.setUtenteId(utenteId);
+            s.setExpiresAt(expires);
+            s.insert();
         } catch (Exception ex) {
             RjLogger.error(ex, "AuthUtility.createSession");
         }
@@ -56,7 +54,6 @@ public class RjAuthUtility {
                 .setPath("/")
                 .setMaxAge(60 * 60 * 8);
 
-
         e.setResponseCookie(session);
         e.setResponseCookie(user);
 
@@ -65,14 +62,13 @@ public class RjAuthUtility {
     public static Long getUtenteId(HttpServerExchange e) {
         Cookie cookie = e.getRequestCookie("rj_session");
         if (cookie == null) return null;
+        String token = cookie.getValue();
+        if (token == null) return null;
 
-        try (Connection c = DataSource.getConnection();
-             PreparedStatement pst = c.prepareStatement(
-                     "SELECT utente_id FROM sessioni WHERE token = ? AND expires_at > NOW()")) {
-            pst.setString(1, cookie.getValue());
-            try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) return rs.getLong("utente_id");
-            }
+        try {
+            Sessioni s = new Sessioni();
+            return s.getUtenteIdByToken(token);
+
         } catch (Exception ex) {
             RjLogger.error(ex, "AuthUtility.getUtenteId");
         }
@@ -82,18 +78,14 @@ public class RjAuthUtility {
     public static void destroySession(HttpServerExchange e) {
         Cookie cookie = e.getRequestCookie("rj_session");
         if (cookie == null) return;
-
-        try (Connection c = DataSource.getConnection();
-             PreparedStatement pst = c.prepareStatement(
-                     "DELETE FROM sessioni WHERE token = ?")) {
-            pst.setString(1, cookie.getValue());
-            pst.executeUpdate();
-
+        String token = cookie.getValue();
+        if (token == null) return;
+        try {
+            Sessioni s = new Sessioni();
+            s.destroy(token);
         } catch (Exception ex) {
             RjLogger.error(ex, "AuthUtility.destroySession");
         }
-
-
         e.setResponseCookie(new CookieImpl("rj_session", "")
                 .setHttpOnly(true)
                 .setPath("/")

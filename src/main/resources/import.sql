@@ -136,7 +136,7 @@ CREATE TABLE  IF NOT EXISTS sessioni(
 -- SELECT
 --     'PRD' || gs,
 --     'Prodotto ' || gs,
---     ROUND((random() * 500 + 10)::numeric, 2)
+--     ROUND((random() * 50000 + 10)::numeric, 2)
 -- FROM generate_series(1,100) gs
 --     ON CONFLICT DO NOTHING;
 --

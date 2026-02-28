@@ -3,6 +3,7 @@ package com.rj.handlers;
 import com.rj.business.html.FilterField;
 import com.rj.business.html.HtmlBuilder;
 import com.rj.constants.RjConstants;
+import com.rj.models.Sessioni;
 import com.rj.models.Utenti;
 import com.rj.utility.RjAuthUtility;
 import com.rj.utility.RjLogger;
@@ -143,6 +144,9 @@ public class UtentiHandler {
     public void delete(HttpServerExchange e) {
         if (RjUtility.redirectIfDirect(e)) return;
         Long id = pathId(e);
+        // elimino le sessioni dell'utente
+        deleteSessioni(id);
+
         Utenti c = new Utenti().findById(id).orElseThrow();
         boolean ok = c.delete();
         if (ok) {
@@ -156,5 +160,14 @@ public class UtentiHandler {
             RjUtility.sendHtml(e, 500, "<p>Errore durante l'eliminazione.</p>");
         }
 
+    }
+
+    private void deleteSessioni(Long id) {
+        List<Sessioni> s = new Sessioni().getSessioniByUtenteId(id);
+        if (s != null && !s.isEmpty()) {
+            for (Sessioni si : s) {
+                si.destroy(si.getToken());
+            }
+        }
     }
 }

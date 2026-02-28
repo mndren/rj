@@ -44,6 +44,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
             if (col != null && col.id()) return f;
             // se non trovo id a true nell'annotazione column dei field
             if (f.getName().equals("id")) return f;
+            return null;
         }
         throw new RuntimeException("nessun campo id trovato in " + this.getClass().getSimpleName());
     }
@@ -178,8 +179,10 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
 
             try (ResultSet keys = pst.getGeneratedKeys()) {
                 if (keys.next()) {
-                    idField.setAccessible(true);
-                    idField.set(this, keys.getLong(1));
+                    if (idField != null) {
+                        idField.setAccessible(true);
+                        idField.set(this, keys.getLong(1));
+                    }
                 }
             }
             loggingQuery(pst);
@@ -250,6 +253,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
 
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isBlank()) {
+
                 sql.append(" AND ").append(entry.getKey()).append(" ILIKE ?");
                 values.add("%" + entry.getValue().toLowerCase() + "%");
             }
