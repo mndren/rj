@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@OrderBy(value = "ragione_sociale asc")
+@OrderBy(value = "ragione_sociale asc limit 100")
 @Table(name = "clienti")
 public class Clienti extends BaseModel<Clienti> {
 

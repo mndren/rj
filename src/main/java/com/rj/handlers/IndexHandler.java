@@ -6,6 +6,7 @@ import io.undertow.server.HttpServerExchange;
 
 public class IndexHandler {
 
+
     public void getPage(HttpServerExchange e) {
         String html = RjUtility.getIndex();
 

@@ -111,6 +111,12 @@ CREATE TABLE IF NOT EXISTS rj_logs (
     ctx             TEXT
     );
 
+CREATE TABLE  IF NOT EXISTS sessioni(
+                          token      VARCHAR(64) PRIMARY KEY,
+                          utente_id  BIGINT REFERENCES utenti(id),
+                          expires_at TIMESTAMP NOT NULL
+);
+
 
 -- ===============================
 -- DATI REALISTICI MASSIVI

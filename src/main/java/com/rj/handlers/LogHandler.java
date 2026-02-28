@@ -47,14 +47,14 @@ public class LogHandler {
         StringBuilder sb = new StringBuilder();
         sb.append("<table id=\"log-table\" hx-get=\"/logs/table\" hx-trigger=\"every 5s\" hx-swap=\"outerHTML\">");
         sb.append("<thead><tr><th>Time</th><th>Level</th><th>Contesto</th><th>Messaggio</th></tr></thead><tbody>");
-
         for (RjLog log : logs) {
             String color = switch (log.level) {
                 case "ERROR" -> "color:#c00";
                 case "WARN" -> "color:#a60";
                 default -> "color:#888";
             };
-            String parsedDate = log.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+            String parsedDate = log.date != null ? log.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) : null;
+
             sb.append("<tr>")
                     .append("<td>").append(parsedDate).append("</td>")
                     .append("<td style=\"").append(color).append(";font-weight:600\">").append(log.level).append("</td>")

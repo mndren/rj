@@ -2,6 +2,7 @@ package com.rj;
 
 import com.rj.db.DataSource;
 import com.rj.handlers.*;
+import com.rj.net.AuthHandler;
 import com.rj.net.ReqLogging;
 import com.rj.utility.RjProperties;
 import io.undertow.Undertow;
@@ -30,11 +31,15 @@ public class App {
         var ch = new ClientiHandler();
         var lh = new LogHandler();
         var uh = new UtentiHandler();
+        var lgh = new LoginHandler();
 
         RoutingHandler routes = new RoutingHandler()
                 // fallback
                 .setFallbackHandler(fh::getPage)
 
+                .get("/login", lgh::loginPage)
+                .post("/login", lgh::login)
+                .get("/logout", lgh::logout)
                 // logs
                 .get(SSR_LOGS, lh::list)
                 .get(SSR_LOGS_TABLE, lh::table)
@@ -73,10 +78,11 @@ public class App {
 
         // logging for all request
         var withLogging = new ReqLogging(routes);
+        var withAuth = new AuthHandler(withLogging);
 
         Undertow server = Undertow.builder()
                 .addHttpListener(8080, "0.0.0.0")
-                .setHandler("true".equalsIgnoreCase(rp.getProp("req.logging")) ? withLogging : routes)
+                .setHandler("true".equalsIgnoreCase(rp.getProp("req.logging")) ? withLogging : new AuthHandler(routes))
                 .build();
 
 

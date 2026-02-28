@@ -4,6 +4,7 @@ import com.rj.business.html.FilterField;
 import com.rj.business.html.HtmlBuilder;
 import com.rj.constants.RjConstants;
 import com.rj.models.Utenti;
+import com.rj.utility.RjAuthUtility;
 import com.rj.utility.RjLogger;
 import com.rj.utility.RjUtility;
 import io.undertow.server.HttpServerExchange;
@@ -93,7 +94,7 @@ public class UtentiHandler {
 
             Utenti c = new Utenti();
             c.setUsername(params.get("username"));
-            c.setPassword_hash(RjUtility.hashPassword(params.get("password_hash")));
+            c.setPassword_hash(RjAuthUtility.hashPassword(params.get("password_hash")));
             c.setRuolo(params.get("ruolo"));
             c.setAttivo(Boolean.valueOf(params.get("attivo")));
 
@@ -120,7 +121,7 @@ public class UtentiHandler {
 
             Utenti c = new Utenti().findById(id).orElseThrow();
             c.setUsername(params.get("username"));
-            c.setPassword_hash(RjUtility.hashPassword(params.get("password_hash")));
+            c.setPassword_hash(RjAuthUtility.hashPassword(params.get("password_hash")));
             c.setRuolo(params.get("ruolo"));
             c.setAttivo(Boolean.valueOf(params.get("attivo")));
 

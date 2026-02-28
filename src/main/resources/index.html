@@ -10,7 +10,8 @@
 <body>
 <div class="app">
     <aside>
-        <div class="logo">RJ</div>
+        <div class="logo" onclick="myhref('/');"><p class="cp">RJ</p></div>
+
         <nav>
             <div class="nav-label">Anagrafiche</div>
             <a class="nav-item" href="#"
@@ -31,7 +32,10 @@
 
     <div class="content-area">
         <div class="topbar">
-            <div class="loading" id="loader"></div>
+            <a class="nav-item" href="/logout">Esci</a>
+            <div class="loading" id="loader">
+
+            </div>
         </div>
 
         <div id="content" hx-indicator="#loader">
@@ -79,6 +83,8 @@
             htmx.ajax('GET', path, { target: '#content', swap: 'innerHTML' });
         }
     });
+      function myhref(web){
+      window.location.href = web;}
 </script>
 </body>
 </html>
