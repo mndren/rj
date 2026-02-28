@@ -129,6 +129,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
     @Override
     public Optional<T> findById(Long id) {
         Field idField = getIdField();
+        if (idField == null) return Optional.empty();
         String sql = "SELECT * FROM " + tableName() + " WHERE " + columnName(idField) + " = ?";
         try (Connection c = DataSource.getConnection();
              PreparedStatement pst = c.prepareStatement(sql)) {
@@ -230,6 +231,7 @@ public abstract class BaseModel<T extends BaseModel<T>> implements Db<T> {
     @Override
     public boolean delete() {
         Field idField = getIdField();
+        if (idField == null) return false;
         String sql = "DELETE FROM " + tableName() + " WHERE " + columnName(idField) + " = ?";
         try (Connection c = DataSource.getConnection();
              PreparedStatement pst = c.prepareStatement(sql)) {
