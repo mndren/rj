@@ -118,6 +118,9 @@ CREATE TABLE  IF NOT EXISTS sessioni(
 );
 
 
+-- INSERT INTO utenti (username, password_hash,ruolo)
+-- VALUES ('admin', encode(sha256('admin'), 'base64'),'admin');
+
 -- ===============================
 -- DATI REALISTICI MASSIVI
 -- ===============================
